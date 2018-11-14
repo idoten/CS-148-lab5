@@ -22,7 +22,11 @@ print PHP_EOL . '<!-- SECTION: 1b form variables -->' . PHP_EOL;
 // Initialize variables one for each form element
 // in the order they appear on the form
 
-$hikers = "hikers"; // hikers list box
+$trailName = ""; // trail name text box
+$totalDistance = "In miles"; // total distance text box
+$hikingTime = "hh:mm:ss"; // hiking time text box
+$verticalRise = "in feet"; // vertical rise text box
+$rating = ""; // rating text box
 //%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
 //
 print PHP_EOL . '<!-- SECTION: 1c form error flags -->' . PHP_EOL;
@@ -30,7 +34,11 @@ print PHP_EOL . '<!-- SECTION: 1c form error flags -->' . PHP_EOL;
 // Initialize Error Flags one for each form element we validate
 // in the order they appear on the form   
 
-$hikersERROR = false;
+$trailNameERROR = false; // trail name error
+$totalDistanceERROR = false; // total distance error
+$hikingTimeERROR = false; // hiking time error
+$verticalRiseERROR = false; // vertical rise error
+$ratingERROR = false; // rating error
 ////%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
 //
 print PHP_EOL . '<!-- SECTION: 1d misc variables -->' . PHP_EOL;
@@ -61,8 +69,11 @@ if (isset($_POST["btnSubmit"])) {
     // remove any potential JavaScript or html code from users input on the
     // form. Note it is best to follow the same order as declared in section 1c.
     
-    $hikers = htmlentities($_POST["lstFavoriteHiker"], ENT_QUOTES, "UTF-8"); 
-    
+    $trailName = htmlentities($_POST["txtTrailName"], ENT_QUOTES, "UTF-8");
+    $totalDistance = htmlentities($_POST["txtTotalDistance"], ENT_QUOTES, "UTF-8");
+    $hikingTime = htmlentities($_POST["txtHikingTime"], ENT_QUOTES, "UTF-8");
+    $verticalRise = htmlentities($_POST["txtVerticalRise"], ENT_QUOTES, "UTF-8");
+    $rating = htmlentities($_POST["txtRating"], ENT_QUOTES, "UTF-8");
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //
     print PHP_EOL . '<!-- SECTION: 2c Validation -->' . PHP_EOL;
@@ -74,16 +85,18 @@ if (isset($_POST["btnSubmit"])) {
     // will be in the order they appear. errorMsg will be displayed on the form
     // see section 3b. The error flag ($emailERROR) will be used in section 3c.
     
-    //hikers error
-    if ($hikers == "") {
-        $errorMsg[] = "Please choose a hiker";
-        $hikersERROR = true;
-    }
-    if ($hikers != "1" AND $hikers != "2" AND $hikers != "3" 
-            AND $hikers != "4" AND $hikers != "5"){
-        $errorMsg[] = "Please choose a proper hiker";
-        $hikersERROR = true;
-    }
+    //$trailName = "trails"; // trail name text box
+    //$totalDistance = "distance"; // total distance text box
+    //$hikingTime = "time"; // hiking time text box
+    //$verticalRise = "rise"; // vertical rise text box
+    //$rating = "rating"; // rating text box
+    
+    //if ($comments != "") {
+    //    if (!verifyAlphaNum($comments)) {
+    //        $errorMsg[] = "Your comments appear to have extra characters that are not allowed.";
+    //        $commentsERROR = true;
+    //    }
+    //}
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //
     print PHP_EOL . '<!-- SECTION: 2d Process Form - Passed Validation -->' . PHP_EOL;
@@ -103,17 +116,23 @@ if (isset($_POST["btnSubmit"])) {
         // array used to hold form values that will be saved to a CSV file
         $dataRecord = array();       
         
-        // assign values to the dataRecord array        
-        $dataRecord[] = $hikers;
+        // assign values to the dataRecord array   
+        $dataRecord[] = $trailName;
+        $dataRecord[] = $totalDistance;
+        $dataRecord[] = $hikingTime;
+        $dataRecord[] = $verticalRise;
+        $dataRecord[] = $rating;
         
          try {
             $thisDatabaseWriter->db->beginTransaction();
 
-            $query = 'INSERT INTO tblHikersTrails SET '; //TABLE
+            $query = 'INSERT INTO tblTrails SET ';
 
-            $query .= 'fnkHikersId = ?, '; //TYPES
-            $query .= 'fnkTrailsId = ?, ';
-            $query .= 'fldDateHiked = ? ';
+            $query .= 'fldTrailName = ?, ';
+            $query .= 'fldTotalDistance = ?, ';
+            $query .= 'fldHikingTime = ?, ';
+            $query .= 'fldVerticalRise = ?, ';
+            $query .= 'fldRating = ? ';
 
             if (DEBUG) {
                 $thisDatabaseWriter->TestSecurityQuery($query, 0);
@@ -207,8 +226,8 @@ print PHP_EOL . '<!-- SECTION 3 Display Form -->' . PHP_EOL;
     
         print $message;
     } else {       
-     print '<h2>Please enter a new hiking venture </h2>';
-     print '<p class="form-heading">Please enter a new hiking venure.</p>';
+     print '<h2>Add Trails</h2>';
+     print '<p class="form-heading">Please enter a new hiking trail.</p>';
      
         //####################################
         //
@@ -249,34 +268,80 @@ print PHP_EOL . '<!-- SECTION 3 Display Form -->' . PHP_EOL;
           id = "frmHiker"
           method = "post">
 
-            <fieldset  class="listbox <?php if ($hikersERROR) print ' mistake'; ?>">
-                <p>
-                <legend>Favorite Hiker</legend>
-                    <select id="FavoriteHiker" 
-                        name="lstFavoriteHiker" 
-                        tabindex="520" >
-                        <option <?php if ($hikers == "1") print " selected "; ?>
-                            value="1">Ian Doten</option>
-
-                        <option <?php if ($hikers == "2") print " selected "; ?>
-                            value="2">Emalee Sprague</option>
-
-                        <option <?php if ($hikers == "3") print " selected "; ?>
-                            value="3">Heidi Grace</option>
-                    
-                        <option <?php if ($hikers == "4") print " selected "; ?>
-                            value="4">Conor Barrett</option>
-                    
-                        <option <?php if ($hikers == "5") print " selected "; ?>
-                            value="5">Howie Woods</option>
-                    </select>
-                </p>
-            </fieldset> <!-- ends list -->
+        <!--trail name-->
+        <fieldset class="textarea">
+            <p>
+                <label  class="required"for="txtTrailName">Trail Name</label>
+                <textarea <?php if ($trailNameERROR) print 'class="mistake"'; ?>
+                    id="txtTrailName" 
+                    name="txtTrailName" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $trailName; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+            </p>
+        </fieldset> <!-- ends text -->
+        
+        <!--total distance-->
+        <fieldset class="textarea">
+            <p>
+                <label  class="required"for="txtTotalDistance">Total Distance</label>
+                <textarea <?php if ($totalDistanceERROR) print 'class="mistake"'; ?>
+                    id="txtTotalDistance" 
+                    name="txtTotalDistance" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $totalDistance; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+            </p>
+        </fieldset> <!-- ends text -->
+        
+        <!--hiking time-->
+        <fieldset class="textarea">
+            <p>
+                <label  class="required"for="txtHikingTime">Hiking Time</label>
+                <textarea <?php if ($hikingTimeERROR) print 'class="mistake"'; ?>
+                    id="txtHikingTime" 
+                    name="txtHikingTime" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $hikingTime; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+            </p>
+        </fieldset> <!-- ends text -->
+        
+        <!--vertical rise-->
+        <fieldset class="textarea">
+            <p>
+                <label  class="required"for="txtVerticalRise">Vertical Rise</label>
+                <textarea <?php if ($verticalRiseERROR) print 'class="mistake"'; ?>
+                    id="txtVerticalRise" 
+                    name="txtVerticalRise" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $verticalRise; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+            </p>
+        </fieldset> <!-- ends text -->
+        
+        <!--rating-->
+        <fieldset class="textarea">
+            <p>
+                <label  class="required"for="txtRating">Rating</label>
+                <textarea <?php if ($ratingERROR) print 'class="mistake"'; ?>
+                    id="txtRating" 
+                    name="txtRating" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $rating; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+            </p>
+        </fieldset> <!-- ends text -->
             
-            <fieldset class="buttons">
-                <legend></legend>
-                <input class = "button" id = "btnSubmit" name = "btnSubmit" tabindex = "900" type = "submit" value = "Submit" >
-            </fieldset> <!-- ends buttons -->
+        <fieldset class="buttons">
+            <legend></legend>
+            <input class = "button" id = "btnSubmit" name = "btnSubmit" tabindex = "900" type = "submit" value = "Submit" >
+        </fieldset> <!-- ends buttons -->
 </form>     
 <?php
     } // ends body submit
