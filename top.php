@@ -23,6 +23,7 @@
         <?php
         
         $debug = false;
+        $isAdmin = true;
         
         // This if statement allows us in the classroom to see what our variables are
         // This is NEVER done on a live site 
