@@ -5,6 +5,10 @@ include 'top.php';
 // This page lists the records based on the query given
 // 
 //##############################################################################
+if($isAdmin = true){
+    print '<a href="form.php">EDIT</a></li>';
+}
+
 $records = '';
 
 $query = 'SELECT fldTrailName, fldTotalDistance, fldHikingTime, 
