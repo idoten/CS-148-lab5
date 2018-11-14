@@ -17,10 +17,16 @@
         print '><a href="../sitemap.php">Sitemap</a></li>';
        
         print '<li ';
-        if ($PATH_PARTS['filename'] == 'Form') {
+        if ($PATH_PARTS['filename'] == 'form-hiker') {
             print ' class="activePage" ';
         }
-        print '><a href="form.php">Form</a></li>';
+        print '><a href="form.php">Form-Hiker-Trails</a></li>';
+        
+        print '<li ';
+        if ($PATH_PARTS['filename'] == 'form-trails') {
+            print ' class="activePage" ';
+        }
+        print '><a href="form-trails.php">Add Trails</a></li>';
         
         print '<li ';
         if ($PATH_PARTS['filename'] == 'tables') {
