@@ -20,7 +20,7 @@
         if ($PATH_PARTS['filename'] == 'form-hiker') {
             print ' class="activePage" ';
         }
-        print '><a href="form.php">Form-Hiker-Trails</a></li>';
+        print '><a href="form-hiker-trails.php">Add Hiker Ventures</a></li>';
         
         print '<li ';
         if ($PATH_PARTS['filename'] == 'form-trails') {
