@@ -24,7 +24,9 @@ print PHP_EOL . '<!-- SECTION: 1b form variables -->' . PHP_EOL;
 
 $trailName = ""; // trail name text box
 $totalDistance = "In miles"; // total distance text box
-$hikingTime = "hh:mm:ss"; // hiking time text box
+$hikingTimeHours = "hh"; // hiking time text box for hours
+$hikingTimeMinutes = "mm"; // hiking time text box for minutes
+$hikingTimeSeconds = "ss"; // hiking time text box for seconds
 $verticalRise = "in feet"; // vertical rise text box
 $rating = ""; // rating text box
 //%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
@@ -36,7 +38,9 @@ print PHP_EOL . '<!-- SECTION: 1c form error flags -->' . PHP_EOL;
 
 $trailNameERROR = false; // trail name error
 $totalDistanceERROR = false; // total distance error
-$hikingTimeERROR = false; // hiking time error
+$hikingTimeHoursERROR = false;
+$hikingTimeMinutesERROR = false;
+$hikingTimeSecondsERROR = false;
 $verticalRiseERROR = false; // vertical rise error
 $ratingERROR = false; // rating error
 ////%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
@@ -71,7 +75,9 @@ if (isset($_POST["btnSubmit"])) {
     
     $trailName = htmlentities($_POST["txtTrailName"], ENT_QUOTES, "UTF-8");
     $totalDistance = htmlentities($_POST["txtTotalDistance"], ENT_QUOTES, "UTF-8");
-    $hikingTime = htmlentities($_POST["txtHikingTime"], ENT_QUOTES, "UTF-8");
+    $hikingTimeHours = htmlentities($_POST["txtHikingTimeHours"], ENT_QUOTES, "UTF-8");
+    $hikingTimeMinutes = htmlentities($_POST["txtHikingTimeMinutes"], ENT_QUOTES, "UTF-8");
+    $hikingTimeSeconds = htmlentities($_POST["txtHikingTimeSeconds"], ENT_QUOTES, "UTF-8");
     $verticalRise = htmlentities($_POST["txtVerticalRise"], ENT_QUOTES, "UTF-8");
     $rating = htmlentities($_POST["txtRating"], ENT_QUOTES, "UTF-8");
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -91,12 +97,57 @@ if (isset($_POST["btnSubmit"])) {
     //$verticalRise = "rise"; // vertical rise text box
     //$rating = "rating"; // rating text box
     
-    //if ($comments != "") {
-    //    if (!verifyAlphaNum($comments)) {
-    //        $errorMsg[] = "Your comments appear to have extra characters that are not allowed.";
-    //        $commentsERROR = true;
-    //    }
-    //}
+    if ($trailName != "") {
+        if (!verifyAlphaNum($trailName)) {
+            $errorMsg[] = "Your trail name appears to have extra characters that are not allowed.";
+            $trailNameERROR = true;
+        }
+    }
+    
+    if ($totalDistance != "") {
+        if (!verifyNumeric($totalDistance)) {
+            $errorMsg[] = "Your distance appears to have extra characters that are not allowed.";
+            $totalDistanceERROR = true;
+        }else if ($totalDistance <= 0) {
+            $errorMsg[] = "Your distance must be more than zero.";
+            $totalDistanceERROR = true;
+        }
+    }
+    
+    if ($hikingTimeHours != "") {
+        if (!verifyNumeric($hikingTimeHours)) {
+            $errorMsg[] = "Your hiking hours appears to have extra characters that are not allowed.";
+            $hikingTimeHoursERROR = true;
+        }
+    }
+    
+    if ($hikingTimeMinutes != "") {
+        if (!verifyNumeric($hikingTimeMinutes)) {
+            $errorMsg[] = "Your hiking minutes appears to have extra characters that are not allowed.";
+            $hikingTimeMinutesERROR = true;
+        }
+    }
+    
+    if ($hikingTimeSeconds != "") {
+        if (!verifyNumeric($hikingTimeSeconds)) {
+            $errorMsg[] = "Your hiking seconds appears to have extra characters that are not allowed.";
+            $hikingTimeSecondsERROR = true;
+        }
+    }
+    
+    if ($verticalRise != "") {
+        if (!verifyNumeric($verticalRise)) {
+            $errorMsg[] = "Your vertical rise appears to have extra characters that are not allowed.";
+            $verticalRiseERROR = true;
+        }
+    }
+    
+    if ($rating != "") {
+        if (!verifyAlphaNum($rating)) {
+            $errorMsg[] = "Your rating appears to have extra characters that are not allowed.";
+            $ratingERROR = true;
+        }
+    }
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //
     print PHP_EOL . '<!-- SECTION: 2d Process Form - Passed Validation -->' . PHP_EOL;
@@ -116,7 +167,8 @@ if (isset($_POST["btnSubmit"])) {
         // array used to hold form values that will be saved to a CSV file
         $dataRecord = array();       
         
-        // assign values to the dataRecord array   
+        // assign values to the dataRecord array 
+        $hikingTime = $hikingTimeHours . ':' . $hikingTimeMinutes . ':' . $hikingTimeSeconds;
         $dataRecord[] = $trailName;
         $dataRecord[] = $totalDistance;
         $dataRecord[] = $hikingTime;
@@ -299,15 +351,32 @@ print PHP_EOL . '<!-- SECTION 3 Display Form -->' . PHP_EOL;
         <!--hiking time-->
         <fieldset class="textarea">
             <p>
-                <label  class="required"for="txtHikingTime">Hiking Time</label>
-                <textarea <?php if ($hikingTimeERROR) print 'class="mistake"'; ?>
-                    id="txtHikingTime" 
-                    name="txtHikingTime" 
+                <label  class="required"for="txtHikingTimeHours">Hiking Time</label>
+                <textarea <?php if ($hikingTimeHoursERROR) print 'class="mistake"'; ?>
+                    id="txtHikingTimeHours" 
+                    name="txtHikingTimeHours" 
                     onfocus="this.select()" 
-                    tabindex="200"><?php print $hikingTime; ?></textarea>
+                    tabindex="200"><?php print $hikingTimeHours; ?></textarea>
                     <!-- NOTE: no blank spaces inside the text area, be sure to close 
                      the text area directly -->
-            </p>
+                    
+                <label  class="required"for="txtHikingTimeMinutes">:</label>
+                <textarea <?php if ($hikingTimeMinutesERROR) print 'class="mistake"'; ?>
+                    id="txtHikingTimeMinutes" 
+                    name="txtHikingTimeMinutes" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $hikingTimeMinutes; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
+                
+                <label  class="required"for="txtHikingTimeSeconds">:</label>
+                <textarea <?php if ($hikingTimeSecondsERROR) print 'class="mistake"'; ?>
+                    id="txtHikingTimeSeconds" 
+                    name="txtHikingTimeSeconds" 
+                    onfocus="this.select()" 
+                    tabindex="200"><?php print $hikingTimeSeconds; ?></textarea>
+                    <!-- NOTE: no blank spaces inside the text area, be sure to close 
+                     the text area directly -->
         </fieldset> <!-- ends text -->
         
         <!--vertical rise-->
