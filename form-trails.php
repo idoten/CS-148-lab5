@@ -33,6 +33,14 @@ $hikingTimeMinutes = "mm"; // hiking time text box for minutes
 $hikingTimeSeconds = "ss"; // hiking time text box for seconds
 $verticalRise = "in feet"; // vertical rise text box
 $rating = ""; // rating text box
+//check boxes
+$dogsAllowed = true;
+$easy = false;
+$hard = false;
+$hiking = false;
+$skiing = false;
+$views = false;
+
 //%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
 //
 // If the form is an update we need to intial the values from the table
@@ -67,6 +75,9 @@ $hikingTimeMinutesERROR = false;
 $hikingTimeSecondsERROR = false;
 $verticalRiseERROR = false; // vertical rise error
 $ratingERROR = false; // rating error
+$activityERROR = false; //check box error
+$totalChecked = 0;
+
 ////%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
 //
 print PHP_EOL . '<!-- SECTION: 1d misc variables -->' . PHP_EOL;
@@ -109,6 +120,42 @@ if (isset($_POST["btnSubmit"])) {
     $hikingTimeSeconds = htmlentities($_POST["txtHikingTimeSeconds"], ENT_QUOTES, "UTF-8");
     $verticalRise = htmlentities($_POST["txtVerticalRise"], ENT_QUOTES, "UTF-8");
     $rating = htmlentities($_POST["txtRating"], ENT_QUOTES, "UTF-8");
+    if (isset($_POST["chkDogsAllowed"])) {
+        $dogsAllowed = true;
+        $totalChecked++;
+    } else {
+        $dogsAllowed = false;
+    }
+    if (isset($_POST["chkEasy"])) {
+        $easy = true;
+        $totalChecked++;
+    } else {
+        $easy = false;
+    }
+    if (isset($_POST["chkHard"])) {
+        $hard = true;
+        $totalChecked++;
+    } else {
+        $hard = false;
+    }
+    if (isset($_POST["chkHiking"])) {
+        $hiking = true;
+        $totalChecked++;
+    } else {
+        $hiking = false;
+    }
+    if (isset($_POST["chkSkiing"])) {
+        $skiing = true;
+        $totalChecked++;
+    } else {
+        $skiing = false;
+    }
+    if (isset($_POST["chkViews"])) {
+        $views = true;
+        $totalChecked++;
+    } else {
+        $views = false;
+    }
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //
     print PHP_EOL . '<!-- SECTION: 2c Validation -->' . PHP_EOL;
@@ -177,6 +224,11 @@ if (isset($_POST["btnSubmit"])) {
             $ratingERROR = true;
         }
     }
+    
+    if ($totalChecked < 1) {
+        $errorMsg[] = "Please choose at least one activity";
+        $activityERROR = true;
+    }
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     //
     print PHP_EOL . '<!-- SECTION: 2d Process Form - Passed Validation -->' . PHP_EOL;
@@ -203,6 +255,12 @@ if (isset($_POST["btnSubmit"])) {
         $dataRecord[] = $hikingTime;
         $dataRecord[] = $verticalRise;
         $dataRecord[] = $rating;
+        $dataRecord[] = $dogsAllowed;
+        $dataRecord[] = $easy;
+        $dataRecord[] = $hard;
+        $dataRecord[] = $hiking;
+        $dataRecord[] = $skiing;
+        $dataRecord[] = $views;
         
         try {
             $thisDatabaseWriter->db->beginTransaction();
@@ -255,7 +313,9 @@ if (isset($_POST["btnSubmit"])) {
             if (DEBUG)
                 print "Error!: " . $e->getMessage() . "</br>";
             $errorMsg[] = "There was a problem with accepting your data please contact us directly.";
-        }    
+        }
+        
+        //insert statement for sending data to tblTrailsTags
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         //
         print PHP_EOL . '<!-- SECTION: 2f Create message -->' . PHP_EOL;
@@ -449,6 +509,61 @@ print PHP_EOL . '<!-- SECTION 3 Display Form -->' . PHP_EOL;
                      the text area directly -->
             </p>
         </fieldset> <!-- ends text -->
+        
+        <!-- check boxes -->
+        <fieldset class="checkbox <?php if ($activityERROR) print ' mistake'; ?>">
+            <legend>Do you like (choose at least one and check all that apply):</legend>
+
+            <p>
+                <label class="check-field">
+                    <input <?php if ($dogsAllowed) print " checked "; ?>
+                        id="chkDogsAllowed"
+                        name="chkDogsAllowed"
+                        tabindex="420"
+                        type="checkbox"
+                        value="Dogs Allowed"> Dogs Allowed</label>
+                
+                <label class="check-field">
+                    <input <?php if ($easy) print " checked "; ?>
+                        id="chkEasy" 
+                        name="chkEasy" 
+                        tabindex="430"
+                        type="checkbox"
+                        value="Easy"> Easy</label>
+                
+                <label class="check-field">
+                    <input <?php if ($hard) print " checked "; ?>
+                        id="chkHard"
+                        name="chkHard"
+                        tabindex="440"
+                        type="checkbox"
+                        value="Hard"> Hard</label>
+                
+                <label class="check-field">
+                    <input <?php if ($hiking) print " checked "; ?>
+                        id="chkHiking" 
+                        name="chkHiking" 
+                        tabindex="450"
+                        type="checkbox"
+                        value="Hiking"> Hiking</label>
+                
+                <label class="check-field">
+                    <input <?php if ($skiing) print " checked "; ?>
+                        id="chkSkiing"
+                        name="chkSkiing"
+                        tabindex="460"
+                        type="checkbox"
+                        value="Skiing"> Skiing</label>
+                
+                <label class="check-field">
+                    <input <?php if ($views) print " checked "; ?>
+                        id="chkViews" 
+                        name="chkViews" 
+                        tabindex="470"
+                        type="checkbox"
+                        value="Views"> Views</label>
+            </p>
+</fieldset>
             
         <fieldset class="buttons">
             <legend></legend>
