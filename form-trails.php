@@ -5,6 +5,9 @@ include 'top.php';
 print  PHP_EOL . '<!-- SECTION: 1 Initialize variables -->' . PHP_EOL;       
 // These variables are used in both sections 2 and 3, otherwise we would
 // declare them in the section we needed them
+//!$update = false;
+//!$hikingTime = "";
+
 print  PHP_EOL . '<!-- SECTION: 1a. debugging setup -->' . PHP_EOL;
 // We print out the post array so that we can see our form is working.
 // Normally i wrap this in a debug statement but for now i want to always
@@ -22,6 +25,7 @@ print PHP_EOL . '<!-- SECTION: 1b form variables -->' . PHP_EOL;
 // Initialize variables one for each form element
 // in the order they appear on the form
 
+//!$pmkTrailsId = -1; //for update
 $trailName = ""; // trail name text box
 $totalDistance = "In miles"; // total distance text box
 $hikingTimeHours = "hh"; // hiking time text box for hours
@@ -31,6 +35,26 @@ $verticalRise = "in feet"; // vertical rise text box
 $rating = ""; // rating text box
 //%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%^%
 //
+// If the form is an update we need to intial the values from the table
+//!if (isset($_GET["id"])) {
+//!    $pmkTrailsId = (int) htmlentities($_GET["id"], ENT_QUOTES, "UTF-8");
+//!
+//!    $query = 'SELECT fldTrailName, fldTotalDistance, fldHikingTime, fldVerticalRise, fldRating ';
+//!    $query .= 'FROM tblTrails WHERE pmkTrailsId = ?';
+//!
+//!    $dataRecord = array($pmkTrailsId);
+//!
+//!    if ($thisDatabaseReader->querySecurityOk($query, 1)) {
+//!        $query = $thisDatabaseReader->sanitizeQuery($query);
+//!        $trail = $thisDatabaseReader->select($query, $dataRecord);
+//!    }
+
+//!    $trailName = $trail[0]["fldTrailName"];
+//!    $totalDistance = $trail[0]["fldTotalDistance"];
+//!    $hikingTime = $trail[0]["fldHikingTime"];
+//!    $verticalRise = $trail[0]["fldVerticalRise"];
+//!    $rating = $trail[0]["fldRating"];
+//!}
 print PHP_EOL . '<!-- SECTION: 1c form error flags -->' . PHP_EOL;
 //
 // Initialize Error Flags one for each form element we validate
@@ -72,6 +96,11 @@ if (isset($_POST["btnSubmit"])) {
     print PHP_EOL . '<!-- SECTION: 2b Sanitize (clean) data  -->' . PHP_EOL;
     // remove any potential JavaScript or html code from users input on the
     // form. Note it is best to follow the same order as declared in section 1c.
+    
+//!    $pmkTrailsId = (int) htmlentities($_POST["hidTrailsId"], ENT_QUOTES, "UTF-8");
+//!    if ($pmkTrailsId > 0) {
+//!        $update = true;
+//!    }
     
     $trailName = htmlentities($_POST["txtTrailName"], ENT_QUOTES, "UTF-8");
     $totalDistance = htmlentities($_POST["txtTotalDistance"], ENT_QUOTES, "UTF-8");
@@ -175,10 +204,13 @@ if (isset($_POST["btnSubmit"])) {
         $dataRecord[] = $verticalRise;
         $dataRecord[] = $rating;
         
-         try {
+        try {
             $thisDatabaseWriter->db->beginTransaction();
-
-            $query = 'INSERT INTO tblTrails SET ';
+         //!   if ($update) {
+         //!       $query = 'UPDATE tblTrails SET ';
+         //!   } else {
+                $query = 'INSERT INTO tblTrails SET ';
+         //!   }
 
             $query .= 'fldTrailName = ?, ';
             $query .= 'fldTotalDistance = ?, ';
@@ -190,18 +222,27 @@ if (isset($_POST["btnSubmit"])) {
                 $thisDatabaseWriter->TestSecurityQuery($query, 0);
                 print_r($dataRecord);
             }
+//!            if ($update) {
+//!                $query .= 'WHERE pmkTrailsId = ?';
+//!                $dataRecord[] = $pmkTrailsId;
 
-            if ($thisDatabaseWriter->querySecurityOk($query, 0)) {
-                $query = $thisDatabaseWriter->sanitizeQuery($query);
-                
-                $results = $thisDatabaseWriter->insert($query, $dataRecord);
-                
-                $primaryKey = $thisDatabaseWriter->lastInsert();
+//!                if ($thisDatabaseReader->querySecurityOk($query, 1)) {
+//!                    $query = $thisDatabaseWriter->sanitizeQuery($query);
+//!                    $results = $thisDatabaseWriter->update($query, $dataRecord);
+//!                }
+//!            } else {
+                if ($thisDatabaseWriter->querySecurityOk($query, 0)) {
+                    $query = $thisDatabaseWriter->sanitizeQuery($query);
 
-                if (DEBUG) {
-                    print "<p>pmk= " . $primaryKey;
+                    $results = $thisDatabaseWriter->insert($query, $dataRecord);
+
+                    $primaryKey = $thisDatabaseWriter->lastInsert();
+
+                    if (DEBUG) {
+                        print "<p>pmk= " . $primaryKey;
+                    }
                 }
-            }
+//!            }
 
             // all sql statements are done so lets commit to our changes
 
@@ -317,9 +358,11 @@ print PHP_EOL . '<!-- SECTION 3 Display Form -->' . PHP_EOL;
 
 
 <form action = "<?php print $phpSelf; ?>"
-          id = "frmHiker"
-          method = "post">
-
+        id = "frmHiker"
+        method = "post">
+<!--        <input type="hidden" id="hidTrailsId" name="hidTrailsId"
+            value="<//?php print $pmkTrailsId; ?>"
+            >
         <!--trail name-->
         <fieldset class="textarea">
             <p>
